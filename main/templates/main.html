@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<nav class="navbar" style="background-color: #ffffff;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="https://cdn-icons-png.flaticon.com/512/487/487932.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Aca
+      </a>
+      <a href="{% url 'main:logout' %}">
+        <button>
+            Logout
+        </button>
+    </a>
+    </div>
+  </nav>
+
+  <body style="background-color: blanchedalmond">
     <h1>Shopping List Page</h1>
 
     <h5>Name:</h5>
@@ -25,6 +41,18 @@
                 <td>{{product.price}}</td>
                 <td>{{product.description}}</td>
                 <td>{{product.date_added}}</td>
+                <td>
+                    <a href="{% url 'main:edit_product' product.pk %}">
+                        <button>
+                            Edit
+                        </button>
+                    </a>
+                    <a href="{% url 'main:delete_product' product.pk %}">
+                        <button>
+                            Delete
+                        </button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>
@@ -36,12 +64,6 @@
     <a href="{% url 'main:create_product' %}">
         <button>
             Add New Product
-        </button>
-    </a>
-
-    <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
         </button>
     </a>
     
