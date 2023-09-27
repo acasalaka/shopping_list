@@ -9,10 +9,8 @@
         Aca
       </a>
       <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
-        </button>
-    </a>
+        <button type="button" class="btn btn-light">Logout</button>      
+      </a>
     </div>
   </nav>
 
@@ -66,5 +64,10 @@
             Add New Product
         </button>
     </a>
+    <a href="{% url 'main:logout' %}">
+        <button>
+            Logout
+        </button>
+      </a>
     
 {% endblock content %}
