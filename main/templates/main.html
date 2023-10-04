@@ -1,5 +1,88 @@
 {% extends 'base.html' %}
 
+{% block meta %}
+
+<title>Shopping List App</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        text-decoration: none;
+    }
+    body {
+        background-color: blanchedalmond;
+    }
+    h5 {
+        margin-top: px;
+        font-size: smaller;
+    }
+    .logout-btn {
+        float: right;
+        padding: 14px 16px;
+        background-color: rgb(232, 232, 232);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .logout-btn:hover {
+        background-color: rgb(198, 197, 197);
+    }
+    table {
+        margin: auto;
+        margin-bottom: 20px;
+        width: 80%;
+        border-color: black;
+        border-width: 1px;
+    }
+    th {
+        background-color: #0070e8;
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+    td {
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+    tr {
+        border: 1px;
+        text-align: center;
+        font-size: 14px;
+        background-color: white;
+        margin: 10px;
+    }
+    tr:last-child {
+        background-color: rgb(198, 197, 197);
+    } 
+    button {
+        background-color: white; 
+        color: black; 
+        padding: 10px 10px;
+        border: none; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        margin-right: 20px;
+        text-decoration: none;
+    }
+    button:hover{
+        background-color: #bababa;
+    }
+    button:visited {
+        color: black;
+    }
+    a {
+        text-decoration: none;
+        color: black;
+    }
+
+</style>
+
+{% endblock meta %}
+
 {% block content %}
 
 <nav class="navbar" style="background-color: #ffffff;">
@@ -8,6 +91,10 @@
         <img src="https://cdn-icons-png.flaticon.com/512/487/487932.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
         Aca
       </a>
+      <a>
+        Shopping List Page
+      </a>
+
       <a href="{% url 'main:logout' %}">
         <button type="button" class="btn btn-light">Logout</button>      
       </a>
@@ -15,7 +102,6 @@
   </nav>
 
   <body style="background-color: blanchedalmond">
-    <h1>Shopping List Page</h1>
 
     <h5>Name:</h5>
     <p>{{name}}</p>
@@ -23,51 +109,99 @@
     <h5>Class:</h5>
     <p>{{class}}</p>
 
-    <table>
-        <tr>
+    <table id="product_table"></table>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="col-form-label">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="col-form-label">Description:</label>
+                            <textarea class="form-control" id="description" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
+
+    <br />
+
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+
+    <br />
+    
+
+
+    <script>
+        async function getProducts() {
+            return fetch("{% url 'main:get_product_json' %}").then((res) => res.json())
+        }
+
+        async function refreshProducts() {
+        document.getElementById("product_table").innerHTML = ""
+        const products = await getProducts()
+        let htmlString = `<tr>
             <th>Name</th>
             <th>Price</th>
             <th>Description</th>
             <th>Date Added</th>
-        </tr>
-    
-        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
-    
-        {% for product in products %}
-            <tr>
-                <td>{{product.name}}</td>
-                <td>{{product.price}}</td>
-                <td>{{product.description}}</td>
-                <td>{{product.date_added}}</td>
-                <td>
-                    <a href="{% url 'main:edit_product' product.pk %}">
-                        <button>
-                            Edit
-                        </button>
-                    </a>
-                    <a href="{% url 'main:delete_product' product.pk %}">
-                        <button>
-                            Delete
-                        </button>
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    
-    <br />
-    
-    <h5>Sesi terakhir login: {{ last_login }}</h5>
-    
-    <a href="{% url 'main:create_product' %}">
-        <button>
-            Add New Product
-        </button>
-    </a>
-    <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
-        </button>
-      </a>
-    
+            <th>Actions</th>
+        </tr>`
+        products.forEach((item) => {
+            console.log(item)
+            htmlString += `\n<tr>
+            <td>${item.fields.name}</td>
+            <td>${item.fields.price}</td>
+            <td>${item.fields.description}</td>
+            <td>${item.fields.date_added}</td>
+            <td>
+                <a href='edit-product/${item.pk}'>
+                    <button>Edit</button>
+                </a>
+                <a href='delete-product/${item.pk}'>
+                    <button>Delete</button>
+                </a>
+            </td>
+        </tr>` 
+        })
+        
+        document.getElementById("product_table").innerHTML = htmlString
+        }
+
+        refreshProducts()
+
+        function addProduct() {
+            fetch("{% url 'main:add_product_ajax' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#form'))
+            }).then(refreshProducts)
+
+            document.getElementById("form").reset()
+            return false
+        }
+
+        document.getElementById("button_add").onclick = addProduct
+    </script>
+        
 {% endblock content %}
